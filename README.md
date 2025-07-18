@@ -3,10 +3,9 @@
 ## Project Overview
 
 **Project Title**: Retail Sales Analysis  
-**Level**: Beginner  
-**Database**: `p1_retail_db`
+**Database**: `sql_project_p2`
 
-This project is designed to demonstrate SQL skills and techniques typically used by data analysts to explore, clean, and analyze retail sales data. The project involves setting up a retail sales database, performing exploratory data analysis (EDA), and answering specific business questions through SQL queries. This project is ideal for those who are starting their journey in data analysis and want to build a solid foundation in SQL.
+This project is designed to demonstrate SQL skills and techniques typically used by data analysts to explore, clean, and analyze retail sales data. The project involves setting up a retail sales database, performing exploratory data analysis (EDA), and answering specific business questions through SQL queries. 
 
 ## Objectives
 
@@ -19,11 +18,11 @@ This project is designed to demonstrate SQL skills and techniques typically used
 
 ### 1. Database Setup
 
-- **Database Creation**: The project starts by creating a database named `p1_retail_db`.
+- **Database Creation**: The project starts by creating a database named `sql_project_p2`.
 - **Table Creation**: A table named `retail_sales` is created to store the sales data. The table structure includes columns for transaction ID, sale date, sale time, customer ID, gender, age, product category, quantity sold, price per unit, cost of goods sold (COGS), and total sale amount.
 
 ```sql
-CREATE DATABASE p1_retail_db;
+CREATE DATABASE sql_project_p2;
 
 CREATE TABLE retail_sales
 (
@@ -114,114 +113,85 @@ SELECT * FROM retail_sales
 WHERE total_sale > 1000
 ```
 
-6. **Write a SQL query to find the total number of transactions (transaction_id) made by each gender in each category.**:
+6. **Number of unique customers per category**:
 ```sql
-SELECT 
-    category,
-    gender,
-    COUNT(*) as total_trans
-FROM retail_sales
-GROUP 
-    BY 
-    category,
-    gender
-ORDER BY 1
-```
-
-7. **Write a SQL query to calculate the average sale for each month. Find out best selling month in each year**:
-```sql
-SELECT 
-       year,
-       month,
-    avg_sale
-FROM 
-(    
-SELECT 
-    EXTRACT(YEAR FROM sale_date) as year,
-    EXTRACT(MONTH FROM sale_date) as month,
-    AVG(total_sale) as avg_sale,
-    RANK() OVER(PARTITION BY EXTRACT(YEAR FROM sale_date) ORDER BY AVG(total_sale) DESC) as rank
-FROM retail_sales
-GROUP BY 1, 2
-) as t1
-WHERE rank = 1
-```
-
-8. **Write a SQL query to find the top 5 customers based on the highest total sales **:
-```sql
-SELECT 
-    customer_id,
-    SUM(total_sale) as total_sales
-FROM retail_sales
-GROUP BY 1
-ORDER BY 2 DESC
-LIMIT 5
-```
-
-9. **Write a SQL query to find the number of unique customers who purchased items from each category.**:
-```sql
-SELECT 
-    category,    
-    COUNT(DISTINCT customer_id) as cnt_unique_cs
+SELECT category, COUNT(DISTINCT customer_id) AS unique_customers
 FROM retail_sales
 GROUP BY category
+ORDER BY unique_customers DESC;
 ```
 
-10. **Write a SQL query to create each shift and number of orders (Example Morning <12, Afternoon Between 12 & 17, Evening >17)**:
+7. **Monthly sales trend (year-month + total sales)**:
 ```sql
-WITH hourly_sale
-AS
-(
-SELECT *,
-    CASE
-        WHEN EXTRACT(HOUR FROM sale_time) < 12 THEN 'Morning'
-        WHEN EXTRACT(HOUR FROM sale_time) BETWEEN 12 AND 17 THEN 'Afternoon'
-        ELSE 'Evening'
-    END as shift
+SELECT
+  DATE_TRUNC('month', sale_date) AS sale_month,
+  SUM(total_sale) AS total_sales
 FROM retail_sales
-)
-SELECT 
-    shift,
-    COUNT(*) as total_orders    
-FROM hourly_sale
+GROUP BY sale_month
+ORDER BY sale_month;
+```
+
+8. **Time-based order distribution (Morning <12, Afternoon 12-17, Evening >17)**:
+```sql
+SELECT
+  CASE
+    WHEN EXTRACT(HOUR FROM sale_time) < 12 THEN 'Morning'
+    WHEN EXTRACT(HOUR FROM sale_time) BETWEEN 12 AND 17 THEN 'Afternoon'
+    ELSE 'Evening'
+  END AS shift,
+  COUNT(*) AS order_count
+FROM retail_sales
 GROUP BY shift
+ORDER BY order_count DESC;
+```
+
+9. **Top 5 customers by total sales.**:
+```sql
+SELECT customer_id, SUM(total_sale) AS total_spent
+FROM retail_sales
+GROUP BY customer_id
+ORDER BY total_spent DESC
+LIMIT 5;
+```
+
+10. **Average total sale per gender per category**:
+```sql
+SELECT gender, category, ROUND(AVG(total_sale)::numeric,2) AS avg_sale
+FROM retail_sales
+GROUP BY gender, category
+ORDER BY category, gender;
 ```
 
 ## Findings
 
-- **Customer Demographics**: The dataset includes customers from various age groups, with sales distributed across different categories such as Clothing and Beauty.
-- **High-Value Transactions**: Several transactions had a total sale amount greater than 1000, indicating premium purchases.
-- **Sales Trends**: Monthly analysis shows variations in sales, helping identify peak seasons.
-- **Customer Insights**: The analysis identifies the top-spending customers and the most popular product categories.
+**Diverse Customer Base:** Sales are spread across different genders and product categories like Clothing, Beauty, and Shoes.
+
+**High-Value Orders:** Multiple transactions exceed Rs. 1,000 — reflecting luxury or bulk buying patterns.
+
+**Category Performance:** Clothing remains the dominant sales driver, followed by Beauty products.
+
+**Sales Patterns:** Monthly and shift-based trends help highlight high-performing time periods.
+
+**Top Customers:** Identified the most loyal and highest-spending customers, helping target retention strategies.
 
 ## Reports
 
-- **Sales Summary**: A detailed report summarizing total sales, customer demographics, and category performance.
-- **Trend Analysis**: Insights into sales trends across different months and shifts.
-- **Customer Insights**: Reports on top customers and unique customer counts per category.
+**Sales Overview:** Category-wise, gender-wise, and overall sales summaries using SUM(), AVG(), and GROUP BY.
+
+**Trend Analysis:**
+
+Monthly sales performance via TO_CHAR(sale_date, 'Month')
+
+Shift-based distribution
+
+**Customer Reports:**
+
+Top 10 customers by total spending
+
+Total unique customers per category
 
 ## Conclusion
 
-This project serves as a comprehensive introduction to SQL for data analysts, covering database setup, data cleaning, exploratory data analysis, and business-driven SQL queries. The findings from this project can help drive business decisions by understanding sales patterns, customer behavior, and product performance.
+This project is a practical application of SQL for Data Analysis, tailored for beginners and intermediate analysts. From querying real-world sales data to generating charts, this covers how businesses can make data-backed decisions using structured queries and visualization.
 
-## How to Use
 
-1. **Clone the Repository**: Clone this project repository from GitHub.
-2. **Set Up the Database**: Run the SQL scripts provided in the `database_setup.sql` file to create and populate the database.
-3. **Run the Queries**: Use the SQL queries provided in the `analysis_queries.sql` file to perform your analysis.
-4. **Explore and Modify**: Feel free to modify the queries to explore different aspects of the dataset or answer additional business questions.
-
-## Author - Zero Analyst
-
-This project is part of my portfolio, showcasing the SQL skills essential for data analyst roles. If you have any questions, feedback, or would like to collaborate, feel free to get in touch!
-
-### Stay Updated and Join the Community
-
-For more content on SQL, data analysis, and other data-related topics, make sure to follow me on social media and join our community:
-
-- **YouTube**: [Subscribe to my channel for tutorials and insights](https://www.youtube.com/@zero_analyst)
-- **Instagram**: [Follow me for daily tips and updates](https://www.instagram.com/zero_analyst/)
-- **LinkedIn**: [Connect with me professionally](https://www.linkedin.com/in/najirr)
-- **Discord**: [Join our community to learn and grow together](https://discord.gg/36h5f2Z5PK)
-
-Thank you for your support, and I look forward to connecting with you!
