@@ -164,31 +164,35 @@ ORDER BY category, gender;
 
 ## Findings
 
-**Diverse Customer Base:** Sales are spread across different genders and product categories like Clothing, Beauty, and Shoes.
+**Diverse Customer Base**: Sales are distributed across multiple categories including Clothing, Beauty, and Electronics, with both genders actively participating in purchases.
 
-**High-Value Orders:** Multiple transactions exceed Rs. 1,000 — reflecting luxury or bulk buying patterns.
+**High-Value Orders**: Several transactions exceed Rs. 1,000, indicating bulk buying or high-ticket items (especially Clothing and Electronics).
 
-**Category Performance:** Clothing remains the dominant sales driver, followed by Beauty products.
+T**op Performing Categories**: Clothing is the highest contributor to revenue, followed by Beauty products, based on total sales and order count.
 
-**Sales Patterns:** Monthly and shift-based trends help highlight high-performing time periods.
+**Sales Timing Trends**: Monthly and shift-based analysis shows peak sales during evening hours and higher activity in Q4 months, especially November.
 
-**Top Customers:** Identified the most loyal and highest-spending customers, helping target retention strategies.
+**Customer Loyalty**: The top 5 customers contribute a significant portion of total sales — identifying power users for targeted retention strategies.
 
 ## Reports
 
-**Sales Overview:** Category-wise, gender-wise, and overall sales summaries using SUM(), AVG(), and GROUP BY.
+**Sales Overview:**
+
+**Category-wise, gender-wise, and overall sales summaries using** SUM(), AVG(), and GROUP BY.
 
 **Trend Analysis:**
 
-Monthly sales performance via TO_CHAR(sale_date, 'Month')
+**Monthly Sales Performance using** DATE_TRUNC('month', sale_date)
 
-Shift-based distribution
+**Shift-Based Sales Distribution (Morning, Afternoon, Evening) using** EXTRACT(HOUR FROM sale_time)
 
 **Customer Reports:**
 
-Top 10 customers by total spending
+**Top 5 Customers** by total spending (GROUP BY customer_id, ORDER BY total_sale DESC)
 
-Total unique customers per category
+**Unique Customer Count per category** (COUNT(DISTINCT customer_id))
+
+
 
 ## Conclusion
 
